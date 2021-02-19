@@ -1,10 +1,11 @@
 {
-  "name": "crm-app-backend",
+  "name": "rml-crm-app-backend",
   "version": "2.2.0",
   "description": "A Node.js starter for Serverless Framework with ES6 and TypeScript support",
   "main": "handler.js",
   "scripts": {
-    "test": "serverless-bundle test"
+    "test": "serverless-bundle test",
+    "start": "nodemon --exec \"serverless serve start\""
   },
   "author": "",
   "license": "MIT",
@@ -19,6 +20,10 @@
     "serverless-offline": "^5.3.3"
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^4.0.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.11.15",
     "uuid": "^7.0.3"
   }
 }
