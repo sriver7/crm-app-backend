@@ -1,14 +1,12 @@
+const mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
 export const hello = async (event, context) => {
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: `Go Serverless v2.0! ${(await message({ time: 1, copy: 'Your function executed successfully for RML CRM App!'}))}`,
-    }),
-  };
+  mongoose.connect(
+    process.env.ATLAS_URI,
+    {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true}
+  );
+  const connection = mongoose.connection;
+  connection.once('open', () => {
+    console.log("MongoDB database connection successful!");
+  });
 };
-
-const message = ({ time, ...rest }) => new Promise((resolve, reject) =>
-  setTimeout(() => {
-    resolve(`${rest.copy} (with a delay)`);
-  }, time * 1000)
-);
