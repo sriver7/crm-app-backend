@@ -1,5 +1,18 @@
 # CRM App Backend
 
+# COSC 880 Project
+
+This project is the backend of my CRM project for COSC 880.
+The front end code is in this GitHub.
+(https://github.com/sriver7/crm-app-frontend)
+
+## Features
+
+- Backend in Node.js/Express using AWS Lambda
+- Database connected to MongoDB via MongoDB Atlas hosted in AWS
+- Schemas created in MongoDB using Mongoose
+- Routes/Functions deployed separately to avoid the long cold starts
+
 # Serverless Node.js Starter
 
 Currently built using the serverless starter kit.
