@@ -10,7 +10,7 @@ module.exports.create = (event, context, callback) => {
   connectToDatabase()
     .then(() => {
       Customer.create(JSON.parse(event.body))
-        .then(note => callback(null, {
+        .then(customer => callback(null, {
           statusCode: 200,
           body: JSON.stringify(customer)
         }))
