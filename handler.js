@@ -72,7 +72,7 @@ module.exports.update = (event, context, callback) => {
       Customer.findByIdAndUpdate(event.pathParameters.id, JSON.parse(event.body), {
           new: true
         })
-        .then(note => callback(null, {
+        .then(customer => callback(null, {
           statusCode: 200,
           body: JSON.stringify(customer)
         }))
@@ -92,7 +92,7 @@ module.exports.delete = (event, context, callback) => {
   connectToDatabase()
     .then(() => {
       Customer.findByIdAndRemove(event.pathParameters.id)
-        .then(note => callback(null, {
+        .then(customer => callback(null, {
           statusCode: 200,
           body: JSON.stringify({
             message: 'Removed customer with id: ' + customer._id,
