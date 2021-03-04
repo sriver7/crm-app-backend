@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
-const Schema =  mongoose.Schema;
-const quote_Schema = new mongoose.Schema({
+const mongoose = require('monoose');
+const QuoteSchema = new mongoose.Schema({
     quote_status: {type: Number, trim: true},
     quote_customer: {
         required: true,
@@ -8,6 +7,6 @@ const quote_Schema = new mongoose.Schema({
         ref: 'Customer'
     }
 },{
-    timestamps: true,
+    timestamps: true
 });
-module.exports = mongoose.model('Quote', quote_Schema);
+module.exports = mongoose.model('Quote', QuoteSchema);

@@ -1,8 +1,5 @@
 const mongoose = require('mongoose');
-
-const Schema = mongoose.Schema;
-
-const customer_schema = new Schema({
+const CustomerSchema = new mongoose.Schema({
     customer_name: {type: String, trim: true, require: true},
     customer_phone_1: {type: String, trim: true},
     customer_phone_2: {type: String, trim: true},
@@ -13,11 +10,7 @@ const customer_schema = new Schema({
     customer_email: {type: String, trime: true},
     customer_note: {type: String, trim: true},
     customer_is_active: {type: Boolean},
-    // Can add Buffer to store images, word, txt, pdf files
-}, {
-    timestamps: true,
+},{
+    timestamps: true
 });
-
-const Customer = mongoose.model('Customer', customer_schema);
-
-module.exports = Customer;
+module.exports = mongoose.model('Customer', CustomerSchema);
