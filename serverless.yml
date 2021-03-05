@@ -174,6 +174,49 @@ functions:
           path: invoices/search/{query}
           method: get
           cors: true
+  #Location functions
+  location_add:
+    handler: locations.create
+    events:
+      - http:
+          path: locations
+          method: post
+          cors: true
+  location_get_by_id:
+    handler: locations.getOne
+    events:
+      - http:
+          path: locations/{id}
+          method: get
+          cors: true
+  location_getAll:
+    handler: locations.getAll
+    events:
+      - http:
+          path: locations
+          method: get
+          cors: true
+  location_update:
+    handler: locations.update
+    events:
+      - http:
+          path: locations/{id}
+          method: put
+          cors: true
+  location_delete:
+    handler: locations.delete
+    events:
+      - http:
+          path: locations/{id}
+          method: delete
+          cors: true
+  locations_get_by_customer:
+    handler: locations.getByCustomer
+    events:
+      - http:
+          path: locations/search/{query}
+          method: get
+          cors: true
 
 plugins:
   - serverless-offline
