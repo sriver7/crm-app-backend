@@ -273,7 +273,7 @@ functions:
 
   # DocuSign functions
   docusign_create:
-    handler: docuSign.create # point to exported create function in handler.js
+    handler: docuSign.create
     events:
       - http:
           path: docusign
