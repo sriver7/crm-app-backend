@@ -88,6 +88,43 @@ functions:
           method: delete
           cors: true
 
+  #Payment functions
+  payment_add:
+    handler: payments.create
+    events:
+      - http:
+          path: payments
+          method: post
+          cors: true
+  payment_get_by_id:
+    handler: payments.getOne
+    events:
+      - http:
+          path: payments/{id}
+          method: get
+          cors: true
+  payment_getAll:
+    handler: payments.getAll
+    events:
+      - http:
+          path: payments
+          method: get
+          cors: true
+  payment_update:
+    handler: payments.update
+    events:
+      - http:
+          path: payments/{id}
+          method: put
+          cors: true
+  payment_delete:
+    handler: payments.delete
+    events:
+      - http:
+          path: payments/{id}
+          method: delete
+          cors: true
+
 plugins:
   - serverless-offline
   # - serverless-bundle # Package our functions with Webpack
