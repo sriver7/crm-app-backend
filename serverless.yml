@@ -1,5 +1,5 @@
 service: rml-crm-app-backend
-# Create an optimized package for our functions
+# Create an optimized package for the functions
 package:
   individually: true
 provider:
@@ -11,54 +11,65 @@ provider:
   region: us-east-1
 
   # environment:
-  #  atlas_uri: ${env:ATLAS_URI}
+  #  var_name: ${env:VARIABLE}
 
 functions:
   # Customer functions
-  create:
-    handler: customers.create # point to exported create function in handler.js
+  customer_create:
+    handler: customers.create
     events:
       - http:
           path: customers
           method: post
           cors: true
-  getOne:
+          authorizer: aws_iam
+
+  customer_getOne:
     handler: customers.getOne
     events:
       - http:
           path: customers/{id}
           method: get
           cors: true
-  getAll:
+          authorizer: aws_iam
+
+  customer_getAll:
     handler: customers.getAll
     events:
       - http:
           path: customers
           method: get
           cors: true
-  update:
+          authorizer: aws_iam
+
+  customer_update:
     handler: customers.update
     events:
       - http:
           path: customers/{id}
           method: put
           cors: true
-  delete:
+          authorizer: aws_iam
+
+  customer_delete:
     handler: customers.delete
     events:
       - http:
           path: customers/{id}
           method: delete
           cors: true
+          authorizer: aws_iam
 
   #Quote functions
   quote_add:
-    handler: quotes.create # point to exported create function in handler.js
+    handler: quotes.create
     events:
       - http:
           path: quotes
           method: post
           cors: true
+          authorizer: aws_iam
+
   quote_get_by_id:
     handler: quotes.getQuoteById
     events:
@@ -66,6 +77,8 @@ functions:
           path: quotes/{id}
           method: get
           cors: true
+          authorizer: aws_iam
+
   quote_getAll:
     handler: quotes.getAllQuotes
     events:
@@ -73,6 +86,8 @@ functions:
           path: quotes
           method: get
           cors: true
+          authorizer: aws_iam
+
   quote_update:
     handler: quotes.updateQuote
     events:
@@ -80,6 +95,8 @@ functions:
           path: quotes/{id}
           method: put
           cors: true
+          authorizer: aws_iam
+
   quote_delete:
     handler: quotes.deleteQuote
     events:
@@ -87,6 +104,7 @@ functions:
           path: quotes/{id}
           method: delete
           cors: true
+          authorizer: aws_iam
 
   # Payment functions
   payment_add:
@@ -96,6 +114,8 @@ functions:
           path: payments
           method: post
           cors: true
+          authorizer: aws_iam
+
   payment_get_by_id:
     handler: payments.getOne
     events:
@@ -103,6 +123,8 @@ functions:
           path: payments/{id}
           method: get
           cors: true
+          authorizer: aws_iam
+
   payment_getAll:
     handler: payments.getAll
     events:
@@ -110,6 +132,8 @@ functions:
           path: payments
           method: get
           cors: true
+          authorizer: aws_iam
+
   payment_update:
     handler: payments.update
     events:
@@ -117,6 +141,8 @@ functions:
           path: payments/{id}
           method: put
           cors: true
+          authorizer: aws_iam
+
   payment_delete:
     handler: payments.delete
     events:
@@ -124,6 +150,8 @@ functions:
           path: payments/{id}
           method: delete
           cors: true
+          authorizer: aws_iam
+
   payment_get_by_customer:
     handler: payments.getByCustomer
     events:
@@ -131,6 +159,8 @@ functions:
           path: payments/search/{query}
           method: get
           cors: true
+          authorizer: aws_iam
+
   # Invoice functions
   invoice_add:
     handler: invoices.create
@@ -139,6 +169,8 @@ functions:
           path: invoices
           method: post
           cors: true
+          authorizer: aws_iam
+
   invoice_get_by_id:
     handler: invoices.getOne
     events:
@@ -146,6 +178,8 @@ functions:
           path: invoices/{id}
           method: get
           cors: true
+          authorizer: aws_iam
+
   invoice_getAll:
     handler: invoices.getAll
     events:
@@ -153,6 +187,8 @@ functions:
           path: invoices
           method: get
           cors: true
+          authorizer: aws_iam
+
   invoice_update:
     handler: invoices.update
     events:
@@ -160,6 +196,8 @@ functions:
           path: invoices/{id}
           method: put
           cors: true
+          authorizer: aws_iam
+
   invoice_delete:
     handler: invoices.delete
     events:
@@ -167,6 +205,8 @@ functions:
           path: invoices/{id}
           method: delete
           cors: true
+          authorizer: aws_iam
+
   invoice_get_by_customer:
     handler: invoices.getByCustomer
     events:
@@ -174,6 +214,8 @@ functions:
           path: invoices/search/{query}
           method: get
           cors: true
+          authorizer: aws_iam
+
   # Location functions
   location_add:
     handler: locations.create
@@ -182,6 +224,8 @@ functions:
           path: locations
           method: post
           cors: true
+          authorizer: aws_iam
+
   location_get_by_id:
     handler: locations.getOne
     events:
@@ -189,6 +233,8 @@ functions:
           path: locations/{id}
           method: get
           cors: true
+          authorizer: aws_iam
+
   location_getAll:
     handler: locations.getAll
     events:
@@ -196,6 +242,8 @@ functions:
           path: locations
           method: get
           cors: true
+          authorizer: aws_iam
+
   location_update:
     handler: locations.update
     events:
@@ -203,6 +251,8 @@ functions:
           path: locations/{id}
           method: put
           cors: true
+          authorizer: aws_iam
+
   location_delete:
     handler: locations.delete
     events:
@@ -210,6 +260,8 @@ functions:
           path: locations/{id}
           method: delete
           cors: true
+          authorizer: aws_iam
+
   locations_get_by_customer:
     handler: locations.getByCustomer
     events:
@@ -217,6 +269,8 @@ functions:
           path: locations/search/{query}
           method: get
           cors: true
+          authorizer: aws_iam
+
   # DocuSign functions
   docusign_create:
     handler: docuSign.create # point to exported create function in handler.js
@@ -225,6 +279,8 @@ functions:
           path: docusign
           method: post
           cors: true
+          authorizer: aws_iam
+
   docusign_getLast:
     handler: docusign.getLast
     events:
@@ -232,6 +288,7 @@ functions:
           path: customers/getAuth
           method: get
           cors: true
+          authorizer: aws_iam
 
 plugins:
   - serverless-offline
