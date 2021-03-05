@@ -9,7 +9,7 @@ const LocationSchema = new mongoose.Schema({
     loc_mulch: {type: Number},
     loc_fallCleanup: {tpye: Number},
     loc_fertilizer: {type: Number},
-    loc_customer: {type: Schema.Types.ObjectId, ref: 'Customer'},
+    loc_customer: {required: true, type: mongoose.Schema.Types.ObjectId, ref: 'Customer'},
 },{
     timestamps: true
 });
