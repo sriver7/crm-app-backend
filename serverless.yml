@@ -88,7 +88,7 @@ functions:
           method: delete
           cors: true
 
-  #Payment functions
+  # Payment functions
   payment_add:
     handler: payments.create
     events:
@@ -131,7 +131,7 @@ functions:
           path: payments/search/{query}
           method: get
           cors: true
-  #Invoice functions
+  # Invoice functions
   invoice_add:
     handler: invoices.create
     events:
@@ -174,7 +174,7 @@ functions:
           path: invoices/search/{query}
           method: get
           cors: true
-  #Location functions
+  # Location functions
   location_add:
     handler: locations.create
     events:
@@ -215,6 +215,21 @@ functions:
     events:
       - http:
           path: locations/search/{query}
+          method: get
+          cors: true
+  # DocuSign functions
+  create:
+    handler: docuSign.create # point to exported create function in handler.js
+    events:
+      - http:
+          path: docusign
+          method: post
+          cors: true
+  getOne:
+    handler: docusign.getLast
+    events:
+      - http:
+          path: customers/getAuth
           method: get
           cors: true
 
