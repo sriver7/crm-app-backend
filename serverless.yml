@@ -51,6 +51,43 @@ functions:
           method: delete
           cors: true
 
+  #Quote functions
+  quote_add:
+    handler: quotes.create # point to exported create function in handler.js
+    events:
+      - http:
+          path: quotes
+          method: post
+          cors: true
+  quote_get_by_id:
+    handler: quotes.getQuoteById
+    events:
+      - http:
+          path: quotes/{id}
+          method: get
+          cors: true
+  quote_getAll:
+    handler: quotes.getAllQuotes
+    events:
+      - http:
+          path: quotes
+          method: get
+          cors: true
+  quote_update:
+    handler: quotes.updateQuote
+    events:
+      - http:
+          path: quotes/{id}
+          method: put
+          cors: true
+  quote_delete:
+    handler: quotes.deleteQuote
+    events:
+      - http:
+          path: quotes/{id}
+          method: delete
+          cors: true
+
 plugins:
   - serverless-offline
   # - serverless-bundle # Package our functions with Webpack

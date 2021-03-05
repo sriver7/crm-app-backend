@@ -1,4 +1,4 @@
-const mongoose = require('monoose');
+const mongoose = require('mongoose');
 const QuoteSchema = new mongoose.Schema({
     quote_status: {type: Number, trim: true},
     quote_customer: {
