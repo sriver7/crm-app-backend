@@ -1,49 +1,50 @@
-service: rml-crm-app-backend # NOTE: update this with your service name
+service: rml-crm-app-backend
 # Create an optimized package for our functions
 package:
   individually: true
 provider:
   name: aws
-  runtime: nodejs12.x # set node.js runtime
+  runtime: nodejs12.x
   memorySize: 128 # set the maximum memory of the Lambdas in Megabytes
   timeout: 10 # the timeout is 10 seconds (default is 6 seconds)
-  stage: prod # setting the env stage to dev, this will be visible in the routes
+  stage: prod
   region: us-east-1
 
   # environment:
   #  atlas_uri: ${env:ATLAS_URI}
 
-functions: # add 4 functions for CRUD
+functions:
+  # Customer functions
   create:
-    handler: handler.create # point to exported create function in handler.js
+    handler: customers.create # point to exported create function in handler.js
     events:
       - http:
           path: customers
           method: post
           cors: true
   getOne:
-    handler: handler.getOne
+    handler: customers.getOne
     events:
       - http:
           path: customers/{id}
           method: get
           cors: true
   getAll:
-    handler: handler.getAll
+    handler: customers.getAll
     events:
       - http:
           path: customers
           method: get
           cors: true
   update:
-    handler: handler.update
+    handler: customers.update
     events:
       - http:
           path: customers/{id}
           method: put
           cors: true
   delete:
-    handler: handler.delete
+    handler: customers.delete
     events:
       - http:
           path: customers/{id}

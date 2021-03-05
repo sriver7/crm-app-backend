@@ -14,7 +14,7 @@ module.exports = connectToDatabase = () => {
       useCreateIndex: true,
       useUnifiedTopology:true
   })
-    .then(db => { 
+    .then(db => {
       isConnected = db.connections[0].readyState;
     });
 };
