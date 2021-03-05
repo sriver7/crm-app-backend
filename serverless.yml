@@ -124,6 +124,13 @@ functions:
           path: payments/{id}
           method: delete
           cors: true
+  payment_get_by_customer:
+    handler: payments.getByCustomer
+    events:
+      - http:
+          path: payments/search/{query}
+          method: get
+          cors: true
 
 plugins:
   - serverless-offline

@@ -108,3 +108,27 @@ module.exports.delete = (event, context, callback) => {
         }));
     });
 };
+
+module.exports.getByCustomer = (event, context, callback) => {
+  context.callbackWaitsForEmptyEventLoop = false;
+
+  connectToDatabase()
+    .then(() => {
+      Payment.find(
+            {
+              "payment_customer": event.pathParameters.query
+            }
+        )
+        .then(payment => callback(null, {
+          statusCode: 200,
+          body: JSON.stringify(payment)
+        }))
+        .catch(err => callback(null, {
+          statusCode: err.statusCode || 500,
+          headers: {
+            'Content-Type': 'text/plain'
+          },
+          body: err
+        }));
+    });
+};
