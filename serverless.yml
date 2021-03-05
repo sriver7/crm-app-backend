@@ -131,6 +131,49 @@ functions:
           path: payments/search/{query}
           method: get
           cors: true
+  #Invoice functions
+  invoice_add:
+    handler: invoices.create
+    events:
+      - http:
+          path: invoices
+          method: post
+          cors: true
+  invoice_get_by_id:
+    handler: invoices.getOne
+    events:
+      - http:
+          path: invoices/{id}
+          method: get
+          cors: true
+  invoice_getAll:
+    handler: invoices.getAll
+    events:
+      - http:
+          path: invoices
+          method: get
+          cors: true
+  invoice_update:
+    handler: invoices.update
+    events:
+      - http:
+          path: invoices/{id}
+          method: put
+          cors: true
+  invoice_delete:
+    handler: invoices.delete
+    events:
+      - http:
+          path: invoices/{id}
+          method: delete
+          cors: true
+  invoice_get_by_customer:
+    handler: invoices.getByCustomer
+    events:
+      - http:
+          path: invoices/search/{query}
+          method: get
+          cors: true
 
 plugins:
   - serverless-offline
