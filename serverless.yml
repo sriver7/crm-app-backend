@@ -218,14 +218,14 @@ functions:
           method: get
           cors: true
   # DocuSign functions
-  create:
+  docusign_create:
     handler: docuSign.create # point to exported create function in handler.js
     events:
       - http:
           path: docusign
           method: post
           cors: true
-  getOne:
+  docusign_getLast:
     handler: docusign.getLast
     events:
       - http:
