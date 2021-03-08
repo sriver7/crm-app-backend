@@ -1,10 +1,10 @@
 'use strict';
-
+import handler from "./libs/handler-lib";
 const connectToDatabase = require('./db');
 const Customer = require('./models/customer.model');
 require('dotenv').config({ path: './variables.env' });
 
-module.exports.create = (event, context, callback) => {
+export const create = handler(async(event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false;
 
   connectToDatabase()
@@ -22,7 +22,7 @@ module.exports.create = (event, context, callback) => {
           body: 'Could not create the customer.'
         }));
     });
-};
+});
 
 module.exports.getOne = (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false;
