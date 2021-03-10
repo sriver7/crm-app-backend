@@ -9,8 +9,7 @@ The front end code is in this GitHub.
 ## Features
 
 - Backend in Node.js/Express using AWS Lambda
-- Database connected to MongoDB via MongoDB Atlas hosted in AWS
-- Schemas created in MongoDB using Mongoose
+- Database connected to DynamoDB
 - Routes/Functions deployed separately to avoid the long cold starts
 
 # Serverless Node.js Starter
