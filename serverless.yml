@@ -1,300 +1,287 @@
+# NOTE: update this with your service name
 service: rml-crm-app-backend
-# Create an optimized package for the functions
+
+# Create an optimized package for our functions
 package:
   individually: true
+
+plugins:
+  - serverless-bundle # Package our functions with Webpack
+  - serverless-offline
+  - serverless-dotenv-plugin # Load .env as environment variables
+
 provider:
   name: aws
   runtime: nodejs12.x
-  memorySize: 128 # set the maximum memory of the Lambdas in Megabytes
-  timeout: 10 # the timeout is 10 seconds (default is 6 seconds)
   stage: prod
   region: us-east-1
+  # To load environment variables externally
+  # rename env.example to .env and uncomment
+  # the following line. Also, make sure to not
+  # commit your .env.
+  #
+  environment:
+    tableName: customers
+    tableNameLocations: locations
+    tableNameInvoices: invoices
+    tableNamePayments: payments
+    tableNameQuotes: quotes
+    tableNameDocuSign: docusign
 
-  # environment:
-  #  var_name: ${env:VARIABLE}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+        - dynamodb:Query
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:DescribeTable
+      Resource: "arn:aws:dynamodb:us-east-1:*:*"
 
 functions:
-  # Customer functions
   customer_create:
-    handler: customers.create
+    handler: customers.customer_create
     events:
       - http:
           path: customers
           method: post
-          cors: true
           authorizer: aws_iam
+          cors: true
 
-  customer_getOne:
-    handler: customers.getOne
+  customer_get:
+    handler: customers.customer_get
     events:
       - http:
           path: customers/{id}
           method: get
-          cors: true
           authorizer: aws_iam
+          cors: true
 
-  customer_getAll:
-    handler: customers.getAll
+  customer_get_all:
+    handler: customers.customers_get_all
     events:
       - http:
           path: customers
           method: get
-          cors: true
           authorizer: aws_iam
+          cors: true
 
   customer_update:
-    handler: customers.update
+    handler: customers.customer_update
     events:
       - http:
           path: customers/{id}
           method: put
-          cors: true
           authorizer: aws_iam
+          cors: true
 
   customer_delete:
-    handler: customers.delete
+    handler: customers.customer_delete
     events:
       - http:
           path: customers/{id}
           method: delete
-          cors: true
           authorizer: aws_iam
-
-  #Quote functions
-  quote_add:
-    handler: quotes.create
-    events:
-      - http:
-          path: quotes
-          method: post
           cors: true
-          authorizer: aws_iam
 
-  quote_get_by_id:
-    handler: quotes.getQuoteById
-    events:
-      - http:
-          path: quotes/{id}
-          method: get
-          cors: true
-          authorizer: aws_iam
+  # END: Customer Functions
+  # BEGIN: Location Functions
 
-  quote_getAll:
-    handler: quotes.getAllQuotes
-    events:
-      - http:
-          path: quotes
-          method: get
-          cors: true
-          authorizer: aws_iam
-
-  quote_update:
-    handler: quotes.updateQuote
-    events:
-      - http:
-          path: quotes/{id}
-          method: put
-          cors: true
-          authorizer: aws_iam
-
-  quote_delete:
-    handler: quotes.deleteQuote
-    events:
-      - http:
-          path: quotes/{id}
-          method: delete
-          cors: true
-          authorizer: aws_iam
-
-  # Payment functions
-  payment_add:
-    handler: payments.create
-    events:
-      - http:
-          path: payments
-          method: post
-          cors: true
-          authorizer: aws_iam
-
-  payment_get_by_id:
-    handler: payments.getOne
-    events:
-      - http:
-          path: payments/{id}
-          method: get
-          cors: true
-          authorizer: aws_iam
-
-  payment_getAll:
-    handler: payments.getAll
-    events:
-      - http:
-          path: payments
-          method: get
-          cors: true
-          authorizer: aws_iam
-
-  payment_update:
-    handler: payments.update
-    events:
-      - http:
-          path: payments/{id}
-          method: put
-          cors: true
-          authorizer: aws_iam
-
-  payment_delete:
-    handler: payments.delete
-    events:
-      - http:
-          path: payments/{id}
-          method: delete
-          cors: true
-          authorizer: aws_iam
-
-  payment_get_by_customer:
-    handler: payments.getByCustomer
-    events:
-      - http:
-          path: payments/search/{query}
-          method: get
-          cors: true
-          authorizer: aws_iam
-
-  # Invoice functions
-  invoice_add:
-    handler: invoices.create
-    events:
-      - http:
-          path: invoices
-          method: post
-          cors: true
-          authorizer: aws_iam
-
-  invoice_get_by_id:
-    handler: invoices.getOne
-    events:
-      - http:
-          path: invoices/{id}
-          method: get
-          cors: true
-          authorizer: aws_iam
-
-  invoice_getAll:
-    handler: invoices.getAll
-    events:
-      - http:
-          path: invoices
-          method: get
-          cors: true
-          authorizer: aws_iam
-
-  invoice_update:
-    handler: invoices.update
-    events:
-      - http:
-          path: invoices/{id}
-          method: put
-          cors: true
-          authorizer: aws_iam
-
-  invoice_delete:
-    handler: invoices.delete
-    events:
-      - http:
-          path: invoices/{id}
-          method: delete
-          cors: true
-          authorizer: aws_iam
-
-  invoice_get_by_customer:
-    handler: invoices.getByCustomer
-    events:
-      - http:
-          path: invoices/search/{query}
-          method: get
-          cors: true
-          authorizer: aws_iam
-
-  # Location functions
-  location_add:
-    handler: locations.create
+  location_create:
+    handler: locations.locations_create
     events:
       - http:
           path: locations
           method: post
-          cors: true
           authorizer: aws_iam
+          cors: true
 
-  location_get_by_id:
-    handler: locations.getOne
+  location_get:
+    handler: locations.location_get
     events:
       - http:
           path: locations/{id}
           method: get
-          cors: true
           authorizer: aws_iam
+          cors: true
 
-  location_getAll:
-    handler: locations.getAll
+  location_get_all:
+    handler: locations.locations_get_all
     events:
       - http:
           path: locations
           method: get
-          cors: true
           authorizer: aws_iam
+          cors: true
+
+  location_get_customer:
+    handler: locations.locations_get_by_customer
+    events:
+      - http:
+          path: locations/customer/{id}
+          method: get
+          authorizer: aws_iam
+          cors: true
 
   location_update:
-    handler: locations.update
+    handler: locations.location_update
     events:
       - http:
           path: locations/{id}
           method: put
-          cors: true
           authorizer: aws_iam
+          cors: true
 
   location_delete:
-    handler: locations.delete
+    handler: locations.location_delete
     events:
       - http:
           path: locations/{id}
           method: delete
-          cors: true
           authorizer: aws_iam
+          cors: true
 
-  locations_get_by_customer:
-    handler: locations.getByCustomer
+  # END: Location Functions
+  # BEGIN: Invoice Functions
+
+  invoice_create:
+    handler: invoices.invoice_create
     events:
       - http:
-          path: locations/search/{query}
-          method: get
-          cors: true
+          path: invoices
+          method: post
           authorizer: aws_iam
+          cors: true
 
-  # DocuSign functions
+  invoice_get:
+    handler: invoices.invoice_get
+    events:
+      - http:
+          path: invoices/{id}
+          method: get
+          authorizer: aws_iam
+          cors: true
+
+  invoice_update:
+    handler: invoices.invoice_update
+    events:
+      - http:
+          path: locations/{id}
+          method: put
+          authorizer: aws_iam
+          cors: true
+
+  invoice_get_customer:
+    handler: invoices.invoice_get_by_customer
+    events:
+      - http:
+          path: invoices/customer/{id}
+          method: get
+          authorizer: aws_iam
+          cors: true
+
+  invoice_delete:
+    handler: invoices.invoice_delete
+    events:
+      - http:
+          path: invoices/{id}
+          method: delete
+          authorizer: aws_iam
+          cors: true
+
+  # END: Invoice Functions
+  # BEGIN: Payment Functions
+
+  payment_create:
+    handler: payments.payments_create
+    events:
+      - http:
+          path: payments
+          method: post
+          authorizer: aws_iam
+          cors: true
+
+  payment_get:
+    handler: payments.payments_get
+    events:
+      - http:
+          path: payments/{id}
+          method: get
+          authorizer: aws_iam
+          cors: true
+
+  payment_update:
+    handler: payments.payments_update
+    events:
+      - http:
+          path: payments/{id}
+          method: put
+          authorizer: aws_iam
+          cors: true
+
+  payment_delete:
+    handler: payments.payments_delete
+    events:
+      - http:
+          path: payments/{id}
+          method: delete
+          authorizer: aws_iam
+          cors: true
+
+  # END: Payment Functions
+  # BEGIN: Quote Functions
+  quote_create:
+    handler: quotes.quotes_create
+    events:
+      - http:
+          path: quotes
+          method: post
+          authorizer: aws_iam
+          cors: true
+
+  quote_get_all:
+    handler: quotes.quotes_get_all
+    events:
+      - http:
+          path: quotes
+          method: get
+          authorizer: aws_iam
+          cors: true
+
+  quote_get:
+    handler: quotes.quotes_get
+    events:
+      - http:
+          path: quotes/{id}
+          method: get
+          authorizer: aws_iam
+          cors: true
+
+  quote_update:
+    handler: quotes.quotes_update
+    events:
+      - http:
+          path: quotes/{id}
+          method: put
+          authorizer: aws_iam
+          cors: true
+
+  quote_delete:
+    handler: quotes.quotes_delete
+    events:
+      - http:
+          path: quotes/{id}
+          method: delete
+          authorizer: aws_iam
+          cors: true
+
   docusign_create:
-    handler: docuSign.create
+    handler: docuSign.docusign_create
     events:
       - http:
           path: docusign
           method: post
-          cors: true
           authorizer: aws_iam
-
-  docusign_getLast:
-    handler: docusign.getLast
-    events:
-      - http:
-          path: customers/getAuth
-          method: get
           cors: true
-          authorizer: aws_iam
-
-resources:
-  # API Gateway Errors
-  - ${file(resources/api-gateway-errors.yml)}
-
-plugins:
-  - serverless-offline
-  # - serverless-bundle # Package our functions with Webpack
-  # - serverless-dotenv-plugin

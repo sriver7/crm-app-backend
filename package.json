@@ -1,27 +1,20 @@
 {
-    "name": "rml-crm-app-backend",
-    "version": "1.0.0",
-    "description": "# COSC 880 Project",
-    "main": "handler.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "dependencies": {
-        "dotenv": "^8.2.0",
-        "mongoose": "^5.11.18"
-    },
-    "devDependencies": {
-        "serverless-offline": "^6.8.0"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/sriver7/crm-app-backend.git"
-    },
-    "bugs": {
-        "url": "https://github.com/sriver7/crm-app-backend/issues"
-    },
-    "homepage": "https://github.com/sriver7/crm-app-backend#readme"
+  "name": "crm-app-backend",
+  "version": "2.2.0",
+  "description": "RML CRM Application",
+  "main": "handler.js",
+  "scripts": {
+    "test": "serverless-bundle test"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "aws-sdk": "^2.859.0",
+    "serverless-bundle": "^3.2.1",
+    "serverless-dotenv-plugin": "^2.1.1",
+    "serverless-offline": "^5.3.3"
+  },
+  "dependencies": {
+    "uuid": "^7.0.3"
+  }
 }

@@ -1,134 +1,80 @@
-'use strict';
+import * as uuid from "uuid";
+import handler from "./libs/handler-lib";
+import dynamoDb from "./libs/dynamodb-lib";
 
-const connectToDatabase = require('./db');
-const Payment = require('./models/payment.model');
-require('dotenv').config({ path: './variables.env' });
+export const payments_create = handler(async(event, context) => {
 
-module.exports.create = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+    const data = JSON.parse(event.body);
+    const params = {
+        TableName: process.env.tableNamePayments,
+        Item: {
+            paymentId: uuid.v1(),
+            customerId: data.customerId,
+            payment_amount: Number(data.payment_amount),
+            payment_check_num: data.payment_check_num,
+            createdAt: Date.now(),
+        },
+    };
+    try {
+        await dynamoDb.put(params).promise();
+        return {
+            statusCode: 200,
+            body: JSON.stringify(params.Item),
+        };
+    } catch (e) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                error: e.message
+            }),
+        };
+    }
+});
 
-  connectToDatabase()
-    .then(() => {
-      Payment.create(JSON.parse(event.body))
-        .then(payment => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(payment)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not create the payment.'
-        }));
-    });
-};
+export const payments_get = handler(async (event, context) => {
+    const params = {
+        TableName: process.env.tableNamePayments,
+        Key: {
+            paymentId: event.pathParameters.id,
+        },
+    };
+    const result = await dynamoDb.get(params);
+    if (!result.Item) {
+        throw new Error("Item not found.");
+    }
+    return result.Item;
+});
 
-module.exports.getOne = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+export const payments_update = handler(async (event, context) => {
+    const data = JSON.parse(event.body);
+    const params = {
+        TableName: process.env.tableNamePayments,
+        Key: {
+            paymentId: event.pathParameters.id,
+        },
+        UpdateExpression: "SET customerId = :customerId, payment_amount = :payment_amount, payment_check_num = :payment_check_num",
+        ExpressionAttributeValues: {
+            ":customerId": data.customerId || null,
+            ":payment_amount": Number(data.payment_amount) || null,
+            ":payment_check_num": data.payment_check_num || null,
+        },
+        ReturnValues: "ALL_NEW",
+    };
+    await dynamoDb.update(params);
+    return {
+        status: true
+    };
+});
 
-  connectToDatabase()
-    .then(() => {
-      Payment.findById(event.pathParameters.id)
-        .then(payment => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(payment)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not fetch the payment.'
-        }));
-    });
-};
-
-module.exports.getAll = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
-
-  connectToDatabase()
-    .then(() => {
-      Payment.find()
-        .then(payments => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(payments)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not fetch the payments.'
-        }))
-    });
-};
-
-module.exports.update = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
-
-  connectToDatabase()
-    .then(() => {
-      Payment.findByIdAndUpdate(event.pathParameters.id, JSON.parse(event.body), {
-          new: true
-        })
-        .then(payment => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(payment)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not fetch the payments.'
-        }));
-    });
-};
-
-module.exports.delete = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
-
-  connectToDatabase()
-    .then(() => {
-      Payment.findByIdAndRemove(event.pathParameters.id)
-        .then(customer => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: 'Removed payment with id: ' + payment._id,
-            payment: payment
-          })
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not fetch the payment.'
-        }));
-    });
-};
-
-module.exports.getByCustomer = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
-
-  connectToDatabase()
-    .then(() => {
-      Payment.find(
-            {
-              "payment_customer": event.pathParameters.query
-            }
-        )
-        .then(payment => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(payment)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: err
-        }));
-    });
-};
+export const payments_delete = handler(async (event, context) => {
+  const params = {
+    TableName: process.env.tableNamePayments,
+    Key: {
+      paymentId: event.pathParameters.id,
+    },
+  };
+  await dynamoDb.delete(params);
+  return {
+    status: true
+  };
+});

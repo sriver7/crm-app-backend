@@ -1,59 +1,33 @@
-'use strict';
+import * as uuid from "uuid";
+import AWS from "aws-sdk";
 
-const connectToDatabase = require('./db');
-const DocuSign = require('./models/docuSign_auth.model');
-require('dotenv').config({ path: './variables.env' });
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
 
-/*
-This route will be hit when redirected from DocuSign
-URL Params will have Auth Key that needs to be temp
-stored for use by the application. 
-*/
-module.exports.create = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
-  const queryString = window.location.search;
-  console.log(queryString);
-  const urlParams = new URLSearchParams(queryString);
-  const auth_key = urlParams.get('access_token');
-  const auth_date = req.body.date;
+export async function docusign_create(event, context) {
+    const data = JSON.parse(event.body);
 
-  connectToDatabase()
-    .then(() => {
-      DocuSign.create(JSON.parse({
-          auth_key, auth_date
-      }))
-        .then(docusign => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(docusign)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not create the docusign auth.'
-        }));
-    });
-};
+    const params = {
+        TableName: process.env.tableNameDocuSign,
+        Item: {
+            docusignId: uuid.v1(),
+            docusign_key: data.docusign_key,
+            createdAt: Date.now(),
+        },
+    };
 
-module.exports.getLast = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+    try {
+        await dynamoDb.put(params).promise();
 
-  connectToDatabase()
-    .then(() => {
-      DocuSign.find().sort({"_id": -1}).limit(1)
-        .then(docusign => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(docusign)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not get the DocuSign Auth.'
-        }));
-    });
-};
-
-// TODO: Redirect request for DocuSign when Ready in FE
+        return {
+            statusCode: 200,
+            body: JSON.stringify(params.Item),
+        };
+    } catch (e) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                error: e.message
+            }),
+        };
+    }
+}

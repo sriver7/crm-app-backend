@@ -1,134 +1,99 @@
-'use strict';
+import * as uuid from "uuid";
+import handler from "./libs/handler-lib";
+import dynamoDb from "./libs/dynamodb-lib";
 
-const connectToDatabase = require('./db');
-const Invoice = require('./models/invoice.model');
-require('dotenv').config({ path: './variables.env' });
+export const  invoice_create = handler(async(event, context) => {
+    const data = JSON.parse(event.body);
+    const params = {
+        TableName: process.env.tableNameInvoices,
+        Item: {
+            invoiceId: uuid.v1(),
+            customerId: data.customerId,
+            invoice_amount: Number(data.invoice_amount),
+            createdAt: Date.now(),
+        },
+    };
+    try {
+        await dynamoDb.put(params).promise();
+        return {
+            statusCode: 200,
+            body: JSON.stringify(params.Item),
+        };
+    } catch (e) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                error: e.message
+            }),
+        };
+    }
+});
 
-module.exports.create = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+export const invoice_get = handler(async (event, context) => {
+    const params = {
+        TableName: process.env.tableNameInvoices,
+        Key: {
+            invoiceId: event.pathParameters.id,
+        },
+    };
+    const result = await dynamoDb.get(params);
+    if (!result.Item) {
+        throw new Error("Item not found.");
+    }
+    return result.Item;
+});
 
-  connectToDatabase()
-    .then(() => {
-      Invoice.create(JSON.parse(event.body))
-        .then(invoice => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(invoice)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not create the invoice.'
-        }));
-    });
-};
+export const invoice_update = handler(async (event, context) => {
+    const data = JSON.parse(event.body);
+    const params = {
+        TableName: process.env.tableNameInvoices,
+        Key: {
+            invoiceId: event.pathParameters.id,
+        },
+        UpdateExpression: "SET customerId = :customerId, invoice_amount = :invoice_amount",
+        ExpressionAttributeValues: {
+            ":customerId": data.customerId || null,
+            ":invoice_amount": Number(data.invoice_amount) || null,
+        },
+        ReturnValues: "ALL_NEW",
+    };
+    await dynamoDb.update(params);
+    return {
+        status: true
+    };
+});
 
-module.exports.getOne = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+export const invoice_get_by_customer = handler(async (event, context) => {
+    const params = {
+        TableName: process.env.tableNameInvoices,
+        FilterExpression: event.pathParameters.customerId,
+        ProjectionExpression: "invoiceId, invoice_amount",
+    };
+    const result = await dynamoDb.scan(params);
+    return result;
+});
 
-  connectToDatabase()
-    .then(() => {
-      Invoice.findById(event.pathParameters.id)
-        .then(invoice => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(invoice)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not fetch the invoice.'
-        }));
-    });
-};
+export const invoice_get_by_customer_date = handler(async (event, context) => {
+    const params = {
+        TableName: process.env.tableNameInvoices,
+        FilterExpression: event.pathParameters.customerId,
+        ProjectionExpression: "invoiceId, invoice_amount",
+    };
+    const result = await dynamoDb.scan(params);
+    return result;
+});
 
-module.exports.getAll = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+export const invoice_delete = handler(async (event, context) => {
+  const params = {
+    TableName: process.env.tableNameInvoices,
+    Key: {
+      invoiceId: event.pathParameters.id,
+    },
+  };
 
-  connectToDatabase()
-    .then(() => {
-      Invoice.find()
-        .then(invoices => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(invoices)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not fetch the invoices.'
-        }))
-    });
-};
+  await dynamoDb.delete(params);
 
-module.exports.update = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
-
-  connectToDatabase()
-    .then(() => {
-      Invoice.findByIdAndUpdate(event.pathParameters.id, JSON.parse(event.body), {
-          new: true
-        })
-        .then(invoice => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(invoice)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not fetch the invoices.'
-        }));
-    });
-};
-
-module.exports.delete = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
-
-  connectToDatabase()
-    .then(() => {
-      Invoice.findByIdAndRemove(event.pathParameters.id)
-        .then(invoice => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: 'Removed invoice with id: ' + invoice._id,
-            invoice: invoice
-          })
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not fetch the invoice.'
-        }));
-    });
-};
-
-module.exports.getByCustomer = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
-
-  connectToDatabase()
-    .then(() => {
-      Invoice.find(
-            {
-              "invoice_customer": event.pathParameters.query
-            }
-        )
-        .then(invoice => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(invoice)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: err
-        }));
-    });
-};
+  return {
+    status: true
+  };
+});

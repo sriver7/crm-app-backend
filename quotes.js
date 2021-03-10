@@ -1,110 +1,87 @@
-'use strict';
+import * as uuid from "uuid";
+import handler from "./libs/handler-lib";
+import dynamoDb from "./libs/dynamodb-lib";
 
-const connectToDatabase = require('./db');
-const Quote = require('./models/quote.model');
-require('dotenv').config({path: './variables.env'});
+export const quotes_create = handler(async(event, context) => {
+    const data = JSON.parse(event.body);
+    const params = {
+        TableName: process.env.tableNameQuotes,
+        Item: {
+            quotesId: uuid.v1(),
+            customerId: data.customerId,
+            quote_status: data.quote_status,
+            createdAt: Date.now(),
+        },
+    };
+    try {
+        await dynamoDb.put(params).promise();
+        return {
+            statusCode: 200,
+            body: JSON.stringify(params.Item),
+        };
+    } catch (e) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                error: e.message
+            }),
+        };
+    }
+});
 
-module.exports.create = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+export const quotes_get_all = handler(async (event, context) => {
+  const params = {
+    TableName: process.env.tableNameQuotes,
+  };
+  // Can aadd projection expression above
+  // ProjectionExpression: "id, customer_name"
+  const result = await dynamoDb.scan(params);
+  return result;
+});
 
-  connectToDatabase()
-    .then(() => {
-      Quote.create(JSON.parse(event.body))
-        .then(quote => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(quote)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: err
-        }));
-    });
-};
+export const quotes_get = handler(async (event, context) => {
+    const params = {
+        TableName: process.env.tableNameQuotes,
+        Key: {
+            quotesId: event.pathParameters.id,
+        },
+    };
+    const result = await dynamoDb.get(params);
+    if (!result.Item) {
+        throw new Error("Item not found.");
+    }
+    return result.Item;
+});
 
-module.exports.getQuoteById = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+export const quotes_update = handler(async (event, context) => {
+    const data = JSON.parse(event.body);
+    const params = {
+        TableName: process.env.tableNameQuotes,
+        Key: {
+            quotesId: event.pathParameters.id,
+        },
+        UpdateExpression: "SET customerId = :customerId, quote_status = :quote_status",
+        ExpressionAttributeValues: {
+            ":customerId": data.customerId || null,
+            ":quote_status": data.quote_status || null,
+        },
+        ReturnValues: "ALL_NEW",
+    };
+    await dynamoDb.update(params);
+    return {
+        status: true
+    };
+});
 
-  connectToDatabase()
-    .then(() => {
-      Quote.findById(event.pathParameters.id)
-        .then(quote => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(quote)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not fetch the quote.'
-        }));
-    });
-};
-
-module.exports.getAllQuotes = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
-
-  connectToDatabase()
-    .then(() => {
-      Quote.find()
-        .then(quotes => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(quotes)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not fetch the quotes.'
-        }))
-    });
-};
-
-module.exports.updateQuote = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
-
-  connectToDatabase()
-    .then(() => {
-      Quote.findByIdAndUpdate(event.pathParameters.id, JSON.parse(event.body), {
-          new: true
-        })
-        .then(quote => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(quote)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not fetch the quote.'
-        }));
-    });
-};
-
-module.exports.deleteQuote = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
-
-  connectToDatabase()
-    .then(() => {
-      Quote.findByIdAndRemove(event.pathParameters.id)
-        .then(quote => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: 'Removed quote with id: ' + quote._id,
-            quote: quote
-          })
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not delete the quote.'
-        }));
-    });
-};
+export const quotes_delete = handler(async (event, context) => {
+  const params = {
+    TableName: process.env.tableNameQuotes,
+    Key: {
+      quotesId: event.pathParameters.id,
+    },
+  };
+  await dynamoDb.delete(params);
+  return {
+    status: true
+  };
+});

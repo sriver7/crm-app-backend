@@ -1,134 +1,120 @@
-'use strict';
+import * as uuid from "uuid";
+import handler from "./libs/handler-lib";
+import dynamoDb from "./libs/dynamodb-lib";
 
-const connectToDatabase = require('./db');
-const Location = require('./models/location.model');
-require('dotenv').config({ path: './variables.env' });
+export const locations_create = handler(async (event, context) => {
+    const data = JSON.parse(event.body);
 
-module.exports.create = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+    const params = {
+        TableName: process.env.tableNameLocations,
+        Item: {
+            locationId: uuid.v1(),
+            customerId: data.customerId,
+            loc_address_1: data.loc_address_1,
+            loc_address_2: data.loc_address_2,
+            loc_city: data.loc_city,
+            loc_state: data.loc_state,
+            loc_zip: data.loc_zip,
+            loc_grass: data.loc_grass,
+            loc_mulch: data.loc_mulch,
+            loc_fallCleanup: data.loc_fallCleanup,
+            loc_fertilizer: data.loc_fertilizer,
+            createdAt: Date.now(),
+        },
+    };
 
-  connectToDatabase()
-    .then(() => {
-      Location.create(JSON.parse(event.body))
-        .then(location => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(location)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not create the location.'
-        }));
-    });
-};
+    try {
+        await dynamoDb.put(params).promise();
 
-module.exports.getOne = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+        return {
+            statusCode: 200,
+            body: JSON.stringify(params.Item),
+        };
+    } catch (e) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                error: e.message
+            }),
+        };
+    }
+});
 
-  connectToDatabase()
-    .then(() => {
-      Location.findById(event.pathParameters.id)
-        .then(location => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(location)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not fetch the location.'
-        }));
-    });
-};
+export const location_get = handler(async (event, context) => {
+    const params = {
+        TableName: process.env.tableNameLocations,
+        Key: {
+            locationId: event.pathParameters.id,
+        },
 
-module.exports.getAll = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+    };
+    const result = await dynamoDb.get(params);
+    if (!result.Item) {
+        throw new Error("Item not found.");
+    }
+    return result.Item;
+});
 
-  connectToDatabase()
-    .then(() => {
-      Location.find()
-        .then(locations => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(locations)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not fetch the locations.'
-        }))
-    });
-};
+export const locations_get_all = handler(async (event, context) => {
+    const params = {
+        TableName: process.env.tableNameLocations,
+    };
+    const result = await dynamoDb.scan(params);
+    return result;
+});
 
-module.exports.update = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+export const locations_get_by_customer = handler(async (event, context) => {
+    const params = {
+        TableName: process.env.tableNameLocations,
+        FilterExpression: event.pathParameters.customerId,
+        ProjectionExpression: "locationId, loc_address_1, loc_city"
+    };
+    const result = await dynamoDb.scan(params);
+    return result;
+});
 
-  connectToDatabase()
-    .then(() => {
-      Location.findByIdAndUpdate(event.pathParameters.id, JSON.parse(event.body), {
-          new: true
-        })
-        .then(location => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(location)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not fetch the locations.'
-        }));
-    });
-};
 
-module.exports.delete = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+export const location_update = handler(async (event, context) => {
+    const data = JSON.parse(event.body);
+    const params = {
+        TableName: process.env.tableNameLocations,
+        Key: {
+            locationId: event.pathParameters.id,
+        },
+        UpdateExpression: "SET customerId = :customerId, loc_address_1 = :loc_address_1, loc_address_2 = :loc_address_2, loc_city = :loc_city, loc_state = :loc_state, loc_zip = :loc_zip, loc_grass = :loc_grass, loc_mulch = :loc_mulch, loc_fallCleanup = :loc_fallCleanup, loc_fertilizer = :loc_fertilizer",
+        ExpressionAttributeValues: {
+            ":customerId": data.customerId || null,
+            ":loc_address_1": data.loc_address_1 || null,
+            ":loc_address_2": data.loc_address_2 || null,
+            ":loc_city": data.loc_city || null,
+            ":loc_state": data.loc_state || null,
+            ":loc_zip": data.loc_zip || null,
+            ":loc_grass": data.loc_grass || null,
+            ":loc_mulch": data.loc_mulch || null,
+            ":loc_fallCleanup": data.loc_fallCleanup || null,
+            ":loc_fertilizer": data.loc_fertilizer || null,
+        },
+        ReturnValues: "ALL_NEW",
+    };
 
-  connectToDatabase()
-    .then(() => {
-      Location.findByIdAndRemove(event.pathParameters.id)
-        .then(location => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: 'Removed location with id: ' + location._id,
-            location: location
-          })
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: 'Could not fetch the location.'
-        }));
-    });
-};
+    await dynamoDb.update(params);
 
-module.exports.getByCustomer = (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false;
+    return {
+        status: true
+    };
+});
 
-  connectToDatabase()
-    .then(() => {
-      Location.find(
-            {
-              "loc_customer": event.pathParameters.query
-            }
-        )
-        .then(location => callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(location)
-        }))
-        .catch(err => callback(null, {
-          statusCode: err.statusCode || 500,
-          headers: {
-            'Content-Type': 'text/plain'
-          },
-          body: err
-        }));
-    });
-};
+export const location_delete = handler(async (event, context) => {
+  const params = {
+    TableName: process.env.tableNameLocations,
+    Key: {
+      locationId: event.pathParameters.id,
+    },
+  };
+
+  await dynamoDb.delete(params);
+
+  return {
+    status: true
+  };
+});
