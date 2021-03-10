@@ -8,6 +8,10 @@ plugins:
   - serverless-offline
   - serverless-dotenv-plugin
 
+resources:
+  # API Gateway Errors
+  - ${file(resources/api-gateway-errors.yml)}
+
 provider:
   name: aws
   runtime: nodejs12.x
@@ -33,10 +37,6 @@ provider:
         - dynamodb:DeleteItem
         - dynamodb:DescribeTable
       Resource: "arn:aws:dynamodb:us-east-1:*:*"
-
-  resources:
-    # API Gateway Errors
-    - ${file(resources/api-gateway-errors.yml)}
 
 functions:
   customer_create:
