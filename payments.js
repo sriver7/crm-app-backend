@@ -66,6 +66,16 @@ export const payments_update = handler(async (event, context) => {
     };
 });
 
+export const payment_get_by_customer = handler(async (event, context) => {
+    const params = {
+        TableName: process.env.tableNamePayments,
+        FilterExpression: event.pathParameters.customerId,
+        ProjectionExpression: "paymentId, payment_amount",
+    };
+    const result = await dynamoDb.scan(params);
+    return result;
+});
+
 export const payments_delete = handler(async (event, context) => {
   const params = {
     TableName: process.env.tableNamePayments,

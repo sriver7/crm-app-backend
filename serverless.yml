@@ -63,7 +63,6 @@ functions:
       - http:
           path: customers
           method: get
-          authorizer: aws_iam
           cors: true
 
   customer_update:
@@ -216,6 +215,15 @@ functions:
       - http:
           path: payments/{id}
           method: put
+          authorizer: aws_iam
+          cors: true
+
+  payment_get_customer:
+    handler: payments.payment_get_by_customer
+    events:
+      - http:
+          path: payments/customer/{id}
+          method: get
           authorizer: aws_iam
           cors: true
 
