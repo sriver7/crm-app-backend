@@ -15,20 +15,10 @@ export const payments_create = handler(async(event, context) => {
             createdAt: Date.now(),
         },
     };
-    try {
-        await dynamoDb.put(params).promise();
-        return {
-            statusCode: 200,
-            body: JSON.stringify(params.Item),
-        };
-    } catch (e) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                error: e.message
-            }),
-        };
-    }
+
+    await dynamoDb.put(params);
+
+    return params.Item;
 });
 
 export const payments_get = handler(async (event, context) => {

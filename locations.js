@@ -23,21 +23,8 @@ export const locations_create = handler(async (event, context) => {
         },
     };
 
-    try {
-        await dynamoDb.put(params).promise();
-
-        return {
-            statusCode: 200,
-            body: JSON.stringify(params.Item),
-        };
-    } catch (e) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                error: e.message
-            }),
-        };
-    }
+    await dynamoDb.put(params);
+    return params.Item;
 });
 
 export const location_get = handler(async (event, context) => {
@@ -66,8 +53,7 @@ export const locations_get_all = handler(async (event, context) => {
 export const locations_get_by_customer = handler(async (event, context) => {
     const params = {
         TableName: process.env.tableNameLocations,
-        FilterExpression: event.pathParameters.customerId,
-        ProjectionExpression: "locationId, loc_address_1, loc_city"
+        FilterExpression: event.pathParameters.customerId
     };
     const result = await dynamoDb.scan(params);
     return result;

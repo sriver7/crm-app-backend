@@ -4,6 +4,7 @@ import dynamoDb from "./libs/dynamodb-lib";
 
 export const  invoice_create = handler(async(event, context) => {
     const data = JSON.parse(event.body);
+
     const params = {
         TableName: process.env.tableNameInvoices,
         Item: {
@@ -13,20 +14,10 @@ export const  invoice_create = handler(async(event, context) => {
             createdAt: Date.now(),
         },
     };
-    try {
-        await dynamoDb.put(params).promise();
-        return {
-            statusCode: 200,
-            body: JSON.stringify(params.Item),
-        };
-    } catch (e) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                error: e.message
-            }),
-        };
-    }
+
+    await dynamoDb.put(params);
+
+    return params.Item;
 });
 
 export const invoice_get = handler(async (event, context) => {

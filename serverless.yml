@@ -45,7 +45,7 @@ functions:
       - http:
           path: customers
           method: post
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   customer_get:
@@ -54,7 +54,7 @@ functions:
       - http:
           path: customers/{id}
           method: get
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   customer_get_all:
@@ -71,7 +71,7 @@ functions:
       - http:
           path: customers/{id}
           method: put
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   customer_delete:
@@ -80,7 +80,7 @@ functions:
       - http:
           path: customers/{id}
           method: delete
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   # END: Customer Functions
@@ -92,7 +92,7 @@ functions:
       - http:
           path: locations
           method: post
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   location_get:
@@ -101,7 +101,7 @@ functions:
       - http:
           path: locations/{id}
           method: get
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   location_get_all:
@@ -110,7 +110,7 @@ functions:
       - http:
           path: locations
           method: get
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   location_get_customer:
@@ -119,7 +119,6 @@ functions:
       - http:
           path: locations/customer/{id}
           method: get
-          authorizer: aws_iam
           cors: true
 
   location_update:
@@ -128,7 +127,7 @@ functions:
       - http:
           path: locations/{id}
           method: put
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   location_delete:
@@ -137,7 +136,7 @@ functions:
       - http:
           path: locations/{id}
           method: delete
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   # END: Location Functions
@@ -149,7 +148,7 @@ functions:
       - http:
           path: invoices
           method: post
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   invoice_get:
@@ -158,7 +157,7 @@ functions:
       - http:
           path: invoices/{id}
           method: get
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   invoice_update:
@@ -167,7 +166,7 @@ functions:
       - http:
           path: locations/{id}
           method: put
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   invoice_get_customer:
@@ -176,7 +175,6 @@ functions:
       - http:
           path: invoices/customer/{id}
           method: get
-          authorizer: aws_iam
           cors: true
 
   invoice_delete:
@@ -185,7 +183,7 @@ functions:
       - http:
           path: invoices/{id}
           method: delete
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   # END: Invoice Functions
@@ -197,7 +195,7 @@ functions:
       - http:
           path: payments
           method: post
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   payment_get:
@@ -206,7 +204,7 @@ functions:
       - http:
           path: payments/{id}
           method: get
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   payment_update:
@@ -215,7 +213,7 @@ functions:
       - http:
           path: payments/{id}
           method: put
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   payment_get_customer:
@@ -224,7 +222,6 @@ functions:
       - http:
           path: payments/customer/{id}
           method: get
-          authorizer: aws_iam
           cors: true
 
   payment_delete:
@@ -233,7 +230,7 @@ functions:
       - http:
           path: payments/{id}
           method: delete
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   # END: Payment Functions
@@ -245,7 +242,7 @@ functions:
       - http:
           path: quotes
           method: post
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   quote_get_all:
@@ -254,7 +251,7 @@ functions:
       - http:
           path: quotes
           method: get
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   quote_get:
@@ -263,7 +260,7 @@ functions:
       - http:
           path: quotes/{id}
           method: get
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   quote_update:
@@ -272,7 +269,7 @@ functions:
       - http:
           path: quotes/{id}
           method: put
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   quote_delete:
@@ -281,7 +278,7 @@ functions:
       - http:
           path: quotes/{id}
           method: delete
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true
 
   docusign_create:
@@ -290,5 +287,5 @@ functions:
       - http:
           path: docusign
           method: post
-          authorizer: aws_iam
+          # authorizer: aws_iam
           cors: true

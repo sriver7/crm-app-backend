@@ -15,19 +15,7 @@ export async function docusign_create(event, context) {
         },
     };
 
-    try {
-        await dynamoDb.put(params).promise();
+    await dynamoDb.put(params);
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify(params.Item),
-        };
-    } catch (e) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                error: e.message
-            }),
-        };
-    }
+    return params.Item;
 }
