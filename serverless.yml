@@ -117,7 +117,7 @@ functions:
     handler: locations.locations_get_by_customer
     events:
       - http:
-          path: locations/customer/{id}
+          path: locationsbyCustomer/{id}
           method: get
           cors: true
 
