@@ -164,9 +164,8 @@ functions:
     handler: invoices.invoice_update
     events:
       - http:
-          path: locations/{id}
+          path: invoices/{id}
           method: put
-          # authorizer: aws_iam
           cors: true
 
   invoice_get_customer:

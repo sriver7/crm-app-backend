@@ -57,18 +57,11 @@ export const invoice_update = handler(async (event, context) => {
 export const invoice_get_by_customer = handler(async (event, context) => {
     const params = {
         TableName: process.env.tableNameInvoices,
-        FilterExpression: event.pathParameters.customerId,
-        ProjectionExpression: "invoiceId, invoice_amount",
-    };
-    const result = await dynamoDb.scan(params);
-    return result;
-});
-
-export const invoice_get_by_customer_date = handler(async (event, context) => {
-    const params = {
-        TableName: process.env.tableNameInvoices,
-        FilterExpression: event.pathParameters.customerId,
-        ProjectionExpression: "invoiceId, invoice_amount",
+        FilterExpression: "customerId = :customerId",
+        ExpressionAttributeValues: {
+            ":customerId": event.pathParameters.id,
+        },
+        ProjectionExpression: "invoiceId, invoice_amount"
     };
     const result = await dynamoDb.scan(params);
     return result;
